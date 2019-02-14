@@ -1,11 +1,11 @@
-var http = require('http');
+let http = require('http');
 //var express = require('express');
 //var fs = require('fs');
-var mysql = require('mysql');
+let mysql = require('mysql');
 //var app = express();
 //app.use(bodyparser.json());
 
-var connection = mysql.createConnection({
+let connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
@@ -20,7 +20,7 @@ connection.connect(function(error) {
   }
 });
 
-var server = http.createServer(function(req, res) {
+let server = http.createServer(function(req, res) {
   if (req.url === '/get' || req.url === "/") {
     console.log('request was made: ' + req.url);
     connection.query("SELECT * FROM todo", function(error, rows, fields) {
