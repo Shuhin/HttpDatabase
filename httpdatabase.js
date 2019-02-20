@@ -8,22 +8,31 @@ var connection = mysql.createConnection({
   database: 'DB'
 });
 
+
 let server = http.createServer(function(req, res) {
 
-  if (req.url === '/get' || req.url === "/") {
+  connection.connect(function(error) {
+    if (error) {
+      res.writeHead(500, { 'content-Type': 'text/plain'});
+      res.end('500 Server Error, Something went wrong with the connection');
+      server.close();
+    } else {
+          console.log('Connected');
+      };
+  });
 
+  if (req.url === '/get' || req.url === "/") {
     console.log('request was made: ' + req.url);
     connection.query("SELECT * FROM DB", function(error, rows) {
       if (error) {
         console.log('Error in the query');
         res.writeHead(400, {'content-Type': 'text/plain'});
-        res.end('400 Bad Request, Please check you query again');
+        res.end('400 Bad Request, Please check your query again');
       } else {
         res.writeHead(200, {'content-type': 'application/json'});
         console.log('Successful query');
         console.log(rows);
         res.end(JSON.stringify(rows));
-
       }
     });
 
@@ -33,7 +42,7 @@ let server = http.createServer(function(req, res) {
       if (error) {
         console.log('Error in the query');
         res.writeHead(400, { 'content-Type': 'text/plain'});
-        res.end('400 Bad Request, Please check you query again');
+        res.end('400 Bad Request, Please check your query again');
         server.close();
       } else {
         res.writeHead(200, {'content-type': 'application/json'});
@@ -48,7 +57,7 @@ let server = http.createServer(function(req, res) {
       if (error) {
       console.log('Error in the query');
       res.writeHead(400, { 'content-Type': 'text/plain'});
-      res.end('400 Bad Request, Please check you query again');
+      res.end('400 Bad Request, Please check your query again');
 
       } else {
         console.log('Successful query');
@@ -57,6 +66,7 @@ let server = http.createServer(function(req, res) {
       }
     });
   }
+
 });
 
 server.listen(3000);
