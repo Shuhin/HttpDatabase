@@ -6,6 +6,8 @@ let app = express();
 
 let errorhandler = require('errorhandler');
 
+let QueryError = false;
+
 var connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -23,6 +25,7 @@ function errorNotification (err, str, req) {
 }
 
 app.use(function check(req, res, next){
+
   connection.connect(function(error) {
     if (error) {
       res.writeHead(500, {'content-Type': 'text/plain'});
@@ -30,17 +33,25 @@ app.use(function check(req, res, next){
       console.log('Connection problem ');
     } else {
       console.log("Database Connection OK")
-        next();
+
+      if(QueryError){
+        console.log('Error in the query');
+        res.writeHead(400, {
+          'content-Type': 'text/plain'
+        });
+        res.end('400 Bad Request, Please check your query again');
+      }
     }
   });
-
+    next();
 });
 
 app.get('/', function(req, res) {
       console.log('request was made: ' + req.url);
       connection.query("SELECT * FROM DB", function(error, rows) {
         if (error){
-              app.use(errorhandler({log: errorNotification}))
+              QueryError =true;
+              return;
         } else {
           res.writeHead(200, {'content-type': 'application/json'});
           console.log('Successful query');
